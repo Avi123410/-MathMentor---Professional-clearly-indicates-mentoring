@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Math Chatbot Tutor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .chat-container {
+      width: 400px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #333;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .chat-messages {
+      padding: 15px;
+      height: 300px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ccc;
+    }
+    .message {
+      margin-bottom: 10px;
+    }
+    .user-message {
+      text-align: right;
+    }
+    .user-message .bubble {
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 15px;
+      display: inline-block;
+      max-width: 80%;
+    }
+    .bot-message .bubble {
+      background: #e2e2e2;
+      color: black;
+      padding: 10px;
+      border-radius: 15px;
+      display: inline-block;
+      max-width: 80%;
+    }
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    .chat-input input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+    .chat-input button {
+      border: none;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">Math Chatbot Tutor</div>
+    <div class="chat-messages" id="chat-messages">
+      <!-- Initial bot greeting -->
+      <div class="message bot-message">
+        <div class="bubble">Hi! I can solve math problems. Try asking: "2+2" or "sqrt(9)"</div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Ask a math question...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const input = document.getElementById("user-input");
+      const chat = document.getElementById("chat-messages");
+      const question = input.value.trim();
+      if (!question) return;
+
+      // User message
+      const userMsg = document.createElement("div");
+      userMsg.className = "message user-message";
+      userMsg.innerHTML = `<div class="bubble">${question}</div>`;
+      chat.appendChild(userMsg);
+
+      // Scroll to bottom
+      chat.scrollTop = chat.scrollHeight;
+
+      // Clear input
+      input.value = "";
+
+      // Bot response (using math.js API)
+      fetch(`https://api.mathjs.org/v4/?expr=${encodeURIComponent(question)}`)
+        .then(response => response.text())
+        .then(answer => {
+          const botMsg = document.createElement("div");
+          botMsg.className = "message bot-message";
+          botMsg.innerHTML = `<div class="bubble">${answer}</div>`;
+          chat.appendChild(botMsg);
+          chat.scrollTop = chat.scrollHeight;
+        })
+        .catch(() => {
+          const botMsg = document.createElement("div");
+          botMsg.className = "message bot-message";
+          botMsg.innerHTML = `<div class="bubble">Sorry, I can only solve math expressions (e.g., "2+2", "sqrt(16)").</div>`;
+          chat.appendChild(botMsg);
+          chat.scrollTop = chat.scrollHeight;
+        });
+    }
+
+    // Allow pressing Enter to send
+    document.getElementById("user-input").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
